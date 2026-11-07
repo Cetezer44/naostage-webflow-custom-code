@@ -12,7 +12,7 @@ https://cdn.jsdelivr.net/gh/Cetezer44/naostage-webflow-custom-code@<TAG>/dist/pa
 https://cdn.jsdelivr.net/gh/Cetezer44/naostage-webflow-custom-code@<TAG>/dist/pages/<page>.min.js
 ```
 
-`<TAG>` = tag git (ex. `v1.0.0`) **ou hash de commit** (ex. `e0ed2b5`, utilisé pour la v1.0.0 : la création du tag depuis l'environnement de migration était bloquée — créer le tag `v1.0.0` sur GitHub depuis le commit `e0ed2b5` si on préfère des URLs lisibles). Les URLs taguées sont immuables et mises en cache définitivement par jsDelivr : **pour déployer une modification, on crée un nouveau tag puis on met à jour le tag dans les snippets Webflow** (site + pages concernées). Les snippets à coller sont dans `webflow/`.
+`<TAG>` = tag git (ex. `v1.0.0`) **ou hash de commit** (ex. `e0ed2b5b1e85d0f6456fb909482f639ded44b4d0`, utilisé pour la v1.0.0 : la création du tag depuis l'environnement de migration était bloquée — créer le tag `v1.0.0` sur GitHub depuis le commit `e0ed2b5` si on préfère des URLs lisibles). Les URLs taguées sont immuables et mises en cache définitivement par jsDelivr : **pour déployer une modification, on crée un nouveau tag puis on met à jour le tag dans les snippets Webflow** (site + pages concernées). Les snippets à coller sont dans `webflow/`.
 
 ## Structure
 
