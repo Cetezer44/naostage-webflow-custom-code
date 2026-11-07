@@ -1,0 +1,23 @@
+/* ── marquee-partners ── source Webflow : home_embed-marquee-partners.html ── */
+  .partners-block {
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+  }
+  .partners-block.is-dragging { cursor: grabbing; }
+
+  .partners-block .flex-partenaires {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 64px;            /* ajuste l'espacement entre logos ici */
+    width: max-content;
+    align-items: center;
+    will-change: transform;
+  }
+  .partners-block .w-dyn-item { flex: 0 0 auto; user-select: none; }
+  .partners-block img {
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }

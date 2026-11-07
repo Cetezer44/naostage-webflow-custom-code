@@ -1,0 +1,102 @@
+/* ── anim-text-reveal ── source Webflow : cmp_main-header_embed-text-reveal.html ── */
+document.addEventListener("DOMContentLoaded", function () {
+
+  if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") return;
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // 🎯 Sélecteur ciblé : tous les éléments avec l'attribut data-anim="text-reveal"
+
+  const SELECTOR = '[data-anim="text-reveal"]';
+
+  const elements = document.querySelectorAll(SELECTOR);
+
+  elements.forEach((el) => {
+
+    const originalText = el.textContent;
+
+    el.setAttribute("aria-label", originalText);
+
+    // Découpe en mots puis en lettres (évite les coupures de mots en fin de ligne)
+
+    const words = originalText.split(" ");
+
+    el.textContent = "";
+
+    words.forEach((word, wIndex) => {
+
+      const wordSpan = document.createElement("span");
+
+      wordSpan.style.display = "inline-block";
+
+      wordSpan.style.whiteSpace = "nowrap";
+
+      wordSpan.setAttribute("aria-hidden", "true");
+
+      [...word].forEach((char) => {
+
+        const letter = document.createElement("span");
+
+        letter.className = "anim-letter";
+
+        letter.style.display = "inline-block";
+
+        letter.textContent = char;
+
+        wordSpan.appendChild(letter);
+
+      });
+
+      el.appendChild(wordSpan);
+
+      if (wIndex < words.length - 1) {
+
+        el.appendChild(document.createTextNode(" "));
+
+      }
+
+    });
+
+    const letters = el.querySelectorAll(".anim-letter");
+
+    // Permet de surcharger les valeurs via des attributs sur l'élément (optionnel)
+
+    const startOpacity = parseFloat(el.dataset.startOpacity) || 0.1;
+
+    const staggerValue = parseFloat(el.dataset.stagger) || 0.1;
+
+    const startPos     = el.dataset.start || "top 85%";
+
+    const endPos       = el.dataset.end   || "bottom 40%";
+
+    gsap.set(letters, { opacity: startOpacity });
+
+    gsap.to(letters, {
+
+      opacity: 1,
+
+      ease: "none",
+
+      stagger: staggerValue,
+
+      scrollTrigger: {
+
+        trigger: el,
+
+        start: startPos,
+
+        end: endPos,
+
+        scrub: true,
+
+        // markers: true,
+
+      },
+
+    });
+
+  });
+
+  window.addEventListener("load", () => ScrollTrigger.refresh());
+
+});

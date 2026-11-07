@@ -1,0 +1,13 @@
+/* ── contact-form ── source Webflow : page_contact_embed-form.html ── */
+  select.select-field.w-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'><path d='M5 6L0 0L10 6.05683e-07L5 6Z' fill='white'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-color: transparent;
+    padding-right: 35px; /* pour que le texte ne passe pas sous l'icône */
+  }
+  /* Anti-spam : champ piège invisible pour les humains */
+  .hp-field { position: absolute !important; left: -9999px !important; top: auto !important; width: 1px !important; height: 1px !important; overflow: hidden !important; opacity: 0 !important; }

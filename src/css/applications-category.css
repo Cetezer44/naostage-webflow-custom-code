@@ -1,0 +1,6 @@
+/* ── applications-category ── source Webflow : page_categorie-applications_embed-app-cat.html ── */
+  @media (min-width: 992px) {
+  .item-application:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+}

@@ -1,0 +1,23 @@
+/* ── marquee-testimonials ── source Webflow : home_embed-marquee-testimonials.html ── */
+  .testimonial-bloc {
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+  }
+  .testimonial-bloc.is-dragging { cursor: grabbing; }
+
+  .testimonial-bloc .flex-testimonials {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 32px;            /* ajuste l'espacement entre cartes ici */
+    width: max-content;
+    align-items: stretch;
+    will-change: transform;
+  }
+  .testimonial-bloc .w-dyn-item { flex: 0 0 auto; user-select: none; }
+  .testimonial-bloc img {
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }

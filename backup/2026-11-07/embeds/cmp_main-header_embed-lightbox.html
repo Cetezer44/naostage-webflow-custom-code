@@ -1,0 +1,85 @@
+<style>
+  #custom-lightbox-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0);
+    display: none; align-items: center; justify-content: center;
+    z-index: 999999;
+    cursor: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 11 11' fill='none'%3E%3Cpath d='M10.5 10.5L5.5 5.5M5.5 5.5L0.5 0.5M5.5 5.5L10.5 0.5M5.5 5.5L0.5 10.5' stroke='white' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 12 12, pointer;
+    transition: background-color .35s ease;
+  }
+  #custom-lightbox-overlay.is-open { display: flex; }
+  #custom-lightbox-overlay.is-visible { background: rgba(0,0,0,.7); }
+  #custom-lightbox-overlay img {
+    max-width: 90vw; max-height: 90vh;
+    width: auto; height: auto; object-fit: contain;
+    display: block; cursor: default; border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    transform-origin: center center;
+    will-change: transform, opacity;
+  }
+  .image-wrapper { cursor: zoom-in; }
+  body.lightbox-open { overflow: hidden; }
+
+  @keyframes lightbox-zoom-in {
+    0%   { transform: scale(.4); opacity: 0; }
+    60%  { opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes lightbox-zoom-out {
+    0%   { transform: scale(1); opacity: 1; }
+    100% { transform: scale(.4); opacity: 0; }
+  }
+  #custom-lightbox-overlay.is-open img {
+    animation: lightbox-zoom-in .4s cubic-bezier(.22,1,.36,1) both;
+  }
+  #custom-lightbox-overlay.is-closing img {
+    animation: lightbox-zoom-out .3s cubic-bezier(.4,0,.6,1) both;
+  }
+  #custom-lightbox-overlay.is-closing { background: rgba(0,0,0,0); }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.createElement('div');
+    overlay.id = 'custom-lightbox-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.innerHTML = '<img alt="">';
+    document.body.appendChild(overlay);
+    const overlayImg = overlay.querySelector('img');
+
+    const open = (src, alt) => {
+      overlayImg.src = src; overlayImg.alt = alt || '';
+      overlay.classList.remove('is-closing');
+      overlay.classList.add('is-open');
+      document.body.classList.add('lightbox-open');
+      requestAnimationFrame(() => overlay.classList.add('is-visible'));
+    };
+
+    const close = () => {
+      overlay.classList.add('is-closing');
+      overlay.classList.remove('is-visible');
+      const onEnd = () => {
+        overlay.classList.remove('is-open', 'is-closing');
+        document.body.classList.remove('lightbox-open');
+        overlayImg.src = '';
+        overlayImg.removeEventListener('animationend', onEnd);
+      };
+      overlayImg.addEventListener('animationend', onEnd);
+    };
+
+    document.querySelectorAll('.image-wrapper').forEach(w => {
+      w.addEventListener('click', e => {
+        const img = w.querySelector('img');
+        if (!img) return;
+        e.preventDefault();
+        open(img.currentSrc || img.src, img.alt);
+      });
+    });
+
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay.classList.contains('is-open')) close();
+    });
+  });
+</script>

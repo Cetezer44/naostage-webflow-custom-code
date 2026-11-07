@@ -1,0 +1,25 @@
+/* ── marquee-recognitions ── source Webflow : home_embed-recognition.html ── */
+  .wrapper-recognitions {
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+  }
+  .wrapper-recognitions.is-dragging { cursor: grabbing; }
+
+  .wrapper-recognitions .list-recognition {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 24px;
+    width: max-content;
+    will-change: transform;
+  }
+  .wrapper-recognitions .item-recognition {
+    flex: 0 0 auto;
+    user-select: none;
+  }
+  .wrapper-recognitions img {
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }

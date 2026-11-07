@@ -1,0 +1,66 @@
+<style>
+
+  /* État fermé par défaut : gap à 0 et padding symétrique */
+  .faq-item-1 {
+    gap: 0;
+    transition: gap 0.4s ease;
+  }
+  .faq-item-1.is-open {
+    gap: 1rem;
+  }
+
+  /* Le titre est cliquable et sa marge basse disparaît à l'état fermé
+     pour que le padding haut/bas du conteneur soit symétrique */
+  .top-faq-item1 {
+    cursor: pointer;
+    margin-bottom: 0 !important;
+    transition: margin-bottom 0.3s ease;
+  }
+  .faq-item-1.is-open .top-faq-item1 {
+    margin-bottom: 16px !important;
+  }
+
+  /* La description est cachée par défaut et s'ouvre avec une transition */
+  .description-faq-item {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+  }
+  .faq-item-1.is-open .description-faq-item {
+    max-height: 2000px;
+    opacity: 1;
+  }
+
+  /* Rotation de la flèche à l'ouverture */
+  .top-faq-item1 img {
+    transition: transform 0.3s ease;
+  }
+  .faq-item-1.is-open .top-faq-item1 img {
+    transform: rotate(180deg);
+  }
+
+</style>
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('.faq-item-1').forEach((item) => {
+
+      const top = item.querySelector('.top-faq-item1');
+      if (!top) return;
+
+      top.addEventListener('click', () => {
+        // Ouvre/ferme uniquement l'item cliqué, sans toucher aux autres
+        item.classList.toggle('is-open');
+      });
+
+    });
+
+  });
+
+</script>

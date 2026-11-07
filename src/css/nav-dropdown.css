@@ -1,0 +1,18 @@
+/* ── nav-dropdown ── source Webflow : cmp_nav-header_embed-dp.html ── */
+  /* ── Dropdown dp-menu ── */
+
+/* Masquer par défaut */
+.dp-links-menus {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+/* Afficher au survol du parent */
+.dp-menu:hover .dp-links-menus {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+  

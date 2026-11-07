@@ -1,0 +1,26 @@
+/* ── carousel-showcases ── source Webflow : home_embed-carroussel-showcases.html ── */
+/* ── Marquee Flex Showcase 2 ── */
+.flex-showcase-2-wrapper {
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+}
+.flex-showcase-2-wrapper.is-dragging { cursor: grabbing; }
+.flex-showcase-2 {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 24px;
+  width: max-content;
+  align-items: stretch;
+  will-change: transform;
+}
+.flex-showcase-2 .w-dyn-item {
+  flex: 0 0 auto;
+  user-select: none;
+}
+.flex-showcase-2 img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+}

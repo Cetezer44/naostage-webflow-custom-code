@@ -1,0 +1,118 @@
+<style>
+  .video_container { position: relative; }
+
+  .img-poster-suse-case {
+    cursor: pointer;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+  }
+
+  .img-poster-suse-case .play-btn {
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+
+  .img-poster-suse-case:hover .play-btn {
+    transform: scale(1.15);
+  }
+
+  .img-poster-suse-case.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  (function () {
+    // 1) Charger l'API YouTube IFrame une seule fois
+    const ytApiReady = new Promise(function (resolve) {
+      if (window.YT && window.YT.Player) return resolve();
+      const previous = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = function () {
+        if (typeof previous === 'function') { try { previous(); } catch (e) {} }
+        resolve();
+      };
+      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+        const s = document.createElement('script');
+        s.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(s);
+      }
+    });
+
+    // 2) Extraire l'ID YouTube depuis une iframe (Embedly OU YouTube direct)
+    function extractYouTubeId(iframe) {
+      const src = iframe.src || '';
+      try {
+        const u = new URL(src);
+        const embeddedSrc = u.searchParams.get('src');
+        const candidate = embeddedSrc ? decodeURIComponent(embeddedSrc) : src;
+        const m = candidate.match(/(?:youtu\.be\/|[?&]v=|\/embed\/)([A-Za-z0-9_-]{11})/);
+        return m ? m[1] : null;
+      } catch (e) { return null; }
+    }
+
+    // 3) Initialiser tous les composants vidéo de la page
+    document.addEventListener('DOMContentLoaded', function () {
+      const ENTRIES = [];
+
+      document.querySelectorAll('.video_container').forEach(function (container, idx) {
+        const poster = container.querySelector('.img-poster-suse-case');
+        const iframe = container.querySelector('iframe');
+        if (!poster || !iframe) return;
+
+        const entry = {
+          poster: poster,
+          originalIframe: iframe,
+          player: null,
+          playerDivId: 'naostage-yt-player-' + idx + '-' + Math.random().toString(36).slice(2, 8)
+        };
+        ENTRIES.push(entry);
+
+        poster.addEventListener('click', function () {
+          // a) Mettre en pause toutes les autres vidéos déjà instanciées
+          ENTRIES.forEach(function (other) {
+            if (other === entry || !other.player) return;
+            try { other.player.pauseVideo(); } catch (e) {}
+          });
+
+          // b) Masquer le poster avec transition
+          poster.classList.add('is-hidden');
+
+          // c) Si le player existe déjà (relance après pause), play simple
+          if (entry.player) {
+            try { entry.player.playVideo(); } catch (e) {}
+            return;
+          }
+
+          // d) Sinon, remplacer l'iframe Embedly par un placeholder + créer YT.Player
+          const videoId = extractYouTubeId(entry.originalIframe);
+          if (!videoId) return;
+
+          const placeholder = document.createElement('div');
+          placeholder.id = entry.playerDivId;
+          placeholder.style.cssText = 'width:100%;height:100%;';
+          entry.originalIframe.parentElement.replaceChild(placeholder, entry.originalIframe);
+
+          ytApiReady.then(function () {
+            entry.player = new YT.Player(entry.playerDivId, {
+              videoId: videoId,
+              width: '100%',
+              height: '100%',
+              playerVars: { autoplay: 1, rel: 0, playsinline: 1 },
+              events: {
+                onReady: function (e) { try { e.target.playVideo(); } catch (err) {} }
+              }
+            });
+          });
+        });
+      });
+    });
+  })();
+</script>

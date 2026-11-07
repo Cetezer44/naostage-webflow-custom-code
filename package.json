@@ -1,0 +1,13 @@
+{
+  "name": "naostage-webflow-custom-code",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Custom code (CSS/JS) du site Webflow naostage.com, servi via jsDelivr",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

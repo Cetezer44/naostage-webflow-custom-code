@@ -1,0 +1,324 @@
+/* ── network-map ── source Webflow : page_network_embed-network.html ── */
+(function () {
+  'use strict';
+
+  /* Une seule instance, même si le script est présent deux fois sur la page */
+  if (window.__naosNetworkMapLoaded) return;
+  window.__naosNetworkMapLoaded = true;
+
+  var FIT_ON_FILTER = true;   // recadrer la carte sur les pins visibles après un filtre
+  var PIN_W = 15, PIN_H = 18;
+
+  var isEN = (document.documentElement.lang || '').toLowerCase().indexOf('en') === 0
+          || window.location.pathname.indexOf('/en') === 0;
+
+  var i18n = {
+    visitSite: isEN ? 'Visit website →' : 'Visiter le site →',
+    all:       isEN ? 'All pins'        : 'Tous les pins'
+  };
+
+  /* Catégories détectées par mot-clé : fonctionne quelle que soit la langue
+     du titre de section ("partenaires" / "partners", etc.) */
+  var CATS = [
+    { key: 'showrooms', test: /showroom/,                      color: '#C928D2', dot: '#4A9FDB',
+      label: 'Showrooms' },
+    { key: 'partners',  test: /partner|partenaire/,            color: '#0E7CD7', dot: '#5BBFD4',
+      label: isEN ? 'Partners' : 'Partenaires' },
+    { key: 'training',  test: /formation|educational|training/, color: '#d09ed3', dot: '#E16B9C',
+      label: isEN ? 'Educational Institutions' : 'Centres de formation' }
+  ];
+  var DEFAULT_COLOR = '#a05bff';
+
+  function norm(s) {
+    return (s || '').toString().toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ').trim();
+  }
+  function catFor(text) {
+    var n = norm(text);
+    for (var i = 0; i < CATS.length; i++) if (CATS[i].test.test(n)) return CATS[i];
+    return null;
+  }
+  function esc(s) {
+    return (s || '').toString()
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ---------------------------------------------------------------- lecture CMS */
+  function readItem(item) {
+    var titleEl    = item.querySelector('.name-network') || item.querySelector('.flex-title-network');
+    var addressEl  = item.querySelector('.adress-network');
+    var coordEl    = item.querySelector('.coordonnes-network');
+    var linkEl     = item.querySelector('a.link-block');
+    var discoverEl = item.querySelector('a.discover-network-item');
+    var pinEl      = item.querySelector('.pin-network');
+    if (!titleEl || !coordEl) return null;
+
+    var parts = coordEl.querySelectorAll(':scope > div');
+    if (parts.length < 2) return null;
+    var lat = parseFloat((parts[0].textContent || '').trim());
+    var lng = parseFloat((parts[1].textContent || '').trim());
+    if (isNaN(lat) || isNaN(lng)) return null;
+
+    var href = linkEl ? linkEl.getAttribute('href') : null;
+    if (!href || href === '#') href = null;
+
+    var section   = item.closest('[class*="section-network"]');
+    var headingEl = section ? section.querySelector('h1, h2, h3, h4') : null;
+    var catLabel  = headingEl ? headingEl.textContent.trim() : '';
+    var cat       = catFor(catLabel);
+
+    var pinHTML = '';
+    if (pinEl) {
+      var clone = pinEl.cloneNode(true);
+      clone.removeAttribute('loading');
+      clone.removeAttribute('id');
+      clone.removeAttribute('data-w-id');
+      clone.style.cssText = 'display:block;width:' + PIN_W + 'px;height:auto;max-width:none;pointer-events:auto;';
+      pinHTML = clone.outerHTML;
+    }
+
+    return {
+      catKey:     cat ? cat.key : 'other',
+      catLabel:   catLabel,
+      color:      cat ? cat.color : DEFAULT_COLOR,
+      city:       (titleEl.textContent || '').trim(),
+      address:    addressEl ? (addressEl.textContent || '').trim() : '',
+      lat: lat, lng: lng, href: href,
+      pinHTML: pinHTML,
+      discoverEl: discoverEl
+    };
+  }
+
+  /* ---------------------------------------------------------------- init carte */
+  function initMap(container) {
+    if (container._leaflet_id) {
+      console.warn('[Naostage map] Carte déjà initialisée par une autre copie du script');
+      return;
+    }
+
+    var points = [];
+    document.querySelectorAll('.collection-list-distributors .item-distributor')
+      .forEach(function (item) { var p = readItem(item); if (p) points.push(p); });
+
+    if (!points.length) { console.warn('[Naostage map] Aucun point valide'); return; }
+
+    var map = L.map(container, {
+      scrollWheelZoom:    false,
+      zoomControl:        true,
+      attributionControl: true,
+      zoomSnap:           0,
+      zoomDelta:          0.5,
+      minZoom:            2,
+      maxBounds:          [[-90, -180], [90, 180]],
+      maxBoundsViscosity: 1.0
+    }).setView([points[0].lat, points[0].lng], 3);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2wog_1_ba5191ff4a62c336f28d91f3', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19,
+      noWrap: true
+    }).addTo(map);
+
+    var entries = [];          // { marker, catKey, point }
+    var current = 'all';
+    var btnWrap = null;
+
+    points.forEach(function (p) {
+      var icon = L.divIcon({
+        className:   'naos-pin-wrapper',
+        html:        p.pinHTML || '<div style="width:8px;height:8px;border-radius:50%;background:' + p.color + ';margin:auto;"></div>',
+        iconSize:    [PIN_W, PIN_H],
+        iconAnchor:  [PIN_W / 2, PIN_H],
+        popupAnchor: [0, -PIN_H]
+      });
+
+      var popupHTML =
+        (p.catLabel ? '<div class="popup-category" style="color:' + p.color + '">' + esc(p.catLabel) + '</div>' : '') +
+        '<div class="popup-city">' + esc(p.city) + '</div>' +
+        (p.address ? '<div class="popup-address">' + esc(p.address) + '</div>' : '') +
+        (p.href ? '<a class="popup-link" style="color:' + p.color + '" href="' + esc(p.href) +
+                  '" target="_blank" rel="noopener">' + i18n.visitSite + '</a>' : '');
+
+      var marker = L.marker([p.lat, p.lng], { icon: icon });
+
+      /* ⚠️ LE FIX : on écoute 'add' AVANT addTo(map), sinon l'événement est déjà
+         passé et data-category n'est jamais posé → les filtres ne trouvent rien.
+         (le handler se rejoue à chaque re-ajout du marqueur après filtrage) */
+      marker.on('add', function () {
+        var el = marker.getElement();
+        if (el) el.dataset.category = p.catKey;
+      });
+
+      marker.bindPopup(popupHTML).addTo(map);
+      entries.push({ marker: marker, catKey: p.catKey, point: p });
+
+      if (p.discoverEl) {
+        p.discoverEl.addEventListener('click', function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (current !== 'all' && current !== p.catKey) applyFilter('all', false);
+          openMarkerOnMap(marker, p);
+        });
+      }
+    });
+
+    function visibleMarkers() {
+      return entries.filter(function (e) { return current === 'all' || e.catKey === current; })
+                    .map(function (e) { return e.marker; });
+    }
+
+    function applyFilter(key, refit) {
+      current = key;
+      entries.forEach(function (e) {
+        var show = (key === 'all' || e.catKey === key);
+        if (show && !map.hasLayer(e.marker)) {
+          e.marker.addTo(map);
+        } else if (!show && map.hasLayer(e.marker)) {
+          e.marker.closePopup();
+          map.removeLayer(e.marker);
+        }
+      });
+      if (btnWrap) {
+        btnWrap.querySelectorAll('.naos-filter-btn').forEach(function (b) {
+          b.classList.toggle('active', b.dataset.filter === key);
+        });
+      }
+      if (refit !== false && FIT_ON_FILTER) {
+        var vis = visibleMarkers();
+        if (vis.length) {
+          map.fitBounds(L.featureGroup(vis).getBounds().pad(0.08), { animate: true });
+        }
+      }
+    }
+
+    function buildButtons() {
+      /* on nettoie tout bloc existant (querySelectorAll gère les id dupliqués) */
+      document.querySelectorAll('#naos-filter-btns, .naos-filter-btns')
+              .forEach(function (el) { el.remove(); });
+
+      btnWrap = document.createElement('div');
+      btnWrap.id = 'naos-filter-btns';
+      btnWrap.className = 'naos-filter-btns';
+
+      var defs = [{ label: i18n.all, filter: 'all', dot: '#6b6b8a' }];
+      CATS.forEach(function (c) {
+        if (entries.some(function (e) { return e.catKey === c.key; })) {
+          defs.push({ label: c.label, filter: c.key, dot: c.dot });
+        }
+      });
+
+      defs.forEach(function (d) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'naos-filter-btn';
+        btn.dataset.filter = d.filter;
+        var dot = document.createElement('span');
+        dot.className = 'naos-btn-dot';
+        dot.style.backgroundColor = d.dot;
+        btn.appendChild(dot);
+        btn.appendChild(document.createTextNode(d.label));
+        btn.addEventListener('click', function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          applyFilter(d.filter, true);
+        });
+        if (L.DomEvent) L.DomEvent.disableClickPropagation(btn);  // le clic ne va pas à la carte
+        btnWrap.appendChild(btn);
+      });
+
+      container.appendChild(btnWrap);
+      btnWrap.querySelector('[data-filter="all"]').classList.add('active');
+
+      /* si une ancienne copie du script ajoute son propre bloc après nous, on le retire */
+      new MutationObserver(function () {
+        container.querySelectorAll('#naos-filter-btns, .naos-filter-btns')
+                 .forEach(function (el) { if (el !== btnWrap) el.remove(); });
+      }).observe(container, { childList: true });
+    }
+
+    buildButtons();
+
+    map.invalidateSize();
+    if (entries.length > 1) {
+      map.fitBounds(L.featureGroup(entries.map(function (e) { return e.marker; })).getBounds().pad(0.05));
+    } else {
+      map.setView([points[0].lat, points[0].lng], 6);
+    }
+
+    /* resize : on recalcule la taille sans écraser le zoom de l'utilisateur */
+    var lastW = container.offsetWidth, rt;
+    window.addEventListener('resize', function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () {
+        map.invalidateSize();
+        var w = container.offsetWidth;
+        if (Math.abs(w - lastW) > 80) {   // vrai changement de largeur (rotation, breakpoint)
+          lastW = w;
+          var vis = visibleMarkers();
+          if (vis.length > 1) map.fitBounds(L.featureGroup(vis).getBounds().pad(0.05));
+        }
+      }, 200);
+    });
+
+    map.on('click',    function () { map.scrollWheelZoom.enable();  });
+    map.on('mouseout', function () { map.scrollWheelZoom.disable(); });
+
+    function openMarkerOnMap(marker, point) {
+      container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      waitForScrollEnd(function () {
+        map.invalidateSize();
+        var targetZoom = Math.max(map.getZoom(), 8);
+        map.setView([point.lat, point.lng], targetZoom, { animate: true, duration: 0.6 });
+        setTimeout(function () { marker.openPopup(); }, 650);
+      });
+    }
+
+    function waitForScrollEnd(cb) {
+      if ('onscrollend' in window) {
+        var onEnd = function () { window.removeEventListener('scrollend', onEnd); cb(); };
+        window.addEventListener('scrollend', onEnd);
+        setTimeout(function () { window.removeEventListener('scrollend', onEnd); cb(); }, 1200);
+        return;
+      }
+      var lastY = window.scrollY, stable = 0;
+      var iv = setInterval(function () {
+        if (window.scrollY === lastY) { if (++stable * 50 >= 150) { clearInterval(iv); cb(); } }
+        else { stable = 0; lastY = window.scrollY; }
+      }, 50);
+      setTimeout(function () { clearInterval(iv); cb(); }, 1500);
+    }
+
+    console.log('[Naostage map] ' + points.length + ' points — catégories : ' +
+      entries.reduce(function (acc, e) { acc[e.catKey] = (acc[e.catKey] || 0) + 1; return acc; }, {}) &&
+      JSON.stringify(entries.reduce(function (acc, e) { acc[e.catKey] = (acc[e.catKey] || 0) + 1; return acc; }, {})));
+  }
+
+  /* ---------------------------------------------------------------- démarrage */
+  function whenLeafletReady(cb, tries) {
+    tries = tries || 0;
+    if (typeof L !== 'undefined') return cb();
+    if (tries > 100) { console.warn('[Naostage map] Leaflet non chargé'); return; }
+    setTimeout(function () { whenLeafletReady(cb, tries + 1); }, 100);
+  }
+
+  function setup() {
+    var container = document.querySelector('.map-resseller');
+    if (!container) { console.warn('[Naostage map] .map-resseller introuvable'); return; }
+
+    var start = function () { whenLeafletReady(function () { initMap(container); }); };
+
+    if (typeof IntersectionObserver === 'undefined') { start(); return; }
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { observer.disconnect(); start(); }
+      });
+    }, { threshold: 0.05 });
+    observer.observe(container);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setup);
+  else setup();
+})();

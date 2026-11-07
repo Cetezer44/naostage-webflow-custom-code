@@ -1,0 +1,19 @@
+/* ── marquee-applications ── source Webflow : cmp_section-application-solution_embed-apps-home.html ── */
+/* ── Marquee Applications Home ── */
+.list-applications-home-wrapper{overflow:hidden;cursor:grab;user-select:none;-webkit-user-select:none;position:relative}
+.list-applications-home-wrapper.is-dragging{cursor:grabbing}
+.list-applications-home{display:flex;flex-wrap:nowrap;gap:24px;width:max-content;align-items:stretch;will-change:transform}
+.list-applications-home .w-dyn-item{flex:0 0 auto;user-select:none}
+.list-applications-home img{pointer-events:none;-webkit-user-drag:none}
+
+/* FIX : filet de sécurité — un clone ne doit jamais rester dans l'état
+   initial d'une animation Webflow (opacity:0 / translateY) */
+.list-applications-home [data-marquee-clone="1"],
+.list-applications-home [data-marquee-clone="1"] > *{
+  opacity:1 !important;
+  transform:none !important;
+  translate:none !important;
+  rotate:none !important;
+  scale:none !important;
+  visibility:visible !important;
+}

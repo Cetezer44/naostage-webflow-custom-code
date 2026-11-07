@@ -1,0 +1,95 @@
+<style>
+  .swiper {
+    overflow: hidden;
+  }
+
+  .swiper-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 0 !important;
+    transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
+  }
+
+  .swiper-slide {
+    width: 380px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .swiper-slide .slider-about-img {
+    width: 300px;
+    margin: 0;
+    opacity: 0.2;
+    filter: grayscale(1);
+    transition:
+      width 0.6s cubic-bezier(0.65, 0, 0.35, 1),
+      filter 0.6s cubic-bezier(0.65, 0, 0.35, 1),
+      opacity 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .swiper-slide.swiper-slide-active .slider-about-img {
+    width: 380px !important;
+    filter: grayscale(0%) !important;
+    opacity: 1 !important;
+  }
+
+  .swiper-slide .slider-about-infos-flex {
+    width: 100%;
+    opacity: 0.4;
+    transition: opacity 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .swiper-slide.swiper-slide-active .slider-about-infos-flex {
+    opacity: 1;
+  }
+
+  .arrow-left,
+  .arrow-right {
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var sliderEl = document.querySelector('.swiper');
+    if (!sliderEl) return;
+
+    var swiper = new Swiper(sliderEl, {
+      slidesPerView: 'auto',
+      centeredSlides: true,
+      spaceBetween: 20,
+      loop: true,
+      grabCursor: true,
+      speed: 700,
+      navigation: {
+        nextEl: '.arrow-right',
+        prevEl: '.arrow-left'
+      }
+    });
+
+    // Sécurité : binding manuel des flèches au cas où
+    // Webflow intercepterait le clic natif.
+    var arrowLeft = document.querySelector('.arrow-left');
+    var arrowRight = document.querySelector('.arrow-right');
+
+    if (arrowLeft) {
+      arrowLeft.addEventListener('click', function (e) {
+        e.preventDefault();
+        swiper.slidePrev();
+      });
+    }
+
+    if (arrowRight) {
+      arrowRight.addEventListener('click', function (e) {
+        e.preventDefault();
+        swiper.slideNext();
+      });
+    }
+  });
+</script>

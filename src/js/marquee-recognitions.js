@@ -1,0 +1,122 @@
+/* ── marquee-recognitions ── source Webflow : home_embed-recognition.html ── */
+(() => {
+  const init = () => {
+    const wrapper = document.querySelector('.wrapper-recognitions');
+    const list    = wrapper && wrapper.querySelector('.list-recognition');
+    if (!wrapper || !list) return;
+
+    // 1) Dupliquer les items pour assurer une boucle visuellement continue
+    const originals = [...list.querySelectorAll('.item-recognition')];
+    if (!originals.length) return;
+    originals.forEach(orig => {
+      const clone = orig.cloneNode(true);
+      clone.setAttribute('data-marquee-clone', '1');
+      clone.setAttribute('aria-hidden', 'true');
+      clone.querySelectorAll('img').forEach(img => img.draggable = false);
+      list.appendChild(clone);
+    });
+
+    // 2) Largeur d'un "set" = position du premier clone
+    let setWidth = list.querySelector('[data-marquee-clone="1"]').offsetLeft;
+
+    const state = {
+      offset: 0,
+      speed: 50,        // px/s (auto-scroll)
+      lastTs: null,
+      dragging: false,
+      pointerId: null,
+      startX: 0,
+      startOffset: 0,
+      lastMoveX: 0,
+      lastMoveTs: 0,
+      velocity: 0,
+      inertia: 0,
+      paused: false,
+      raf: 0
+    };
+
+    const apply = () => {
+      let o = state.offset % setWidth;
+      if (o > 0) o -= setWidth;
+      list.style.transform = `translate3d(${o}px,0,0)`;
+    };
+
+    const tick = (ts) => {
+      if (state.lastTs == null) state.lastTs = ts;
+      const dt = (ts - state.lastTs) / 1000;
+      state.lastTs = ts;
+
+      if (!state.dragging && !state.paused) {
+        let v = -state.speed;
+        if (Math.abs(state.inertia) > 1) {
+          v = state.inertia;
+          state.inertia *= Math.pow(0.94, dt * 60);
+          if (Math.abs(state.inertia) < state.speed) state.inertia = 0;
+        }
+        state.offset += v * dt;
+        apply();
+      }
+      state.raf = requestAnimationFrame(tick);
+    };
+
+    // 3) Drag handlers
+    const onDown = (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      state.dragging   = true;
+      state.pointerId  = e.pointerId;
+      state.startX     = e.clientX;
+      state.startOffset = state.offset;
+      state.lastMoveX  = e.clientX;
+      state.lastMoveTs = performance.now();
+      state.velocity   = 0;
+      wrapper.classList.add('is-dragging');
+      try { wrapper.setPointerCapture(e.pointerId); } catch(_) {}
+    };
+    const onMove = (e) => {
+      if (!state.dragging || e.pointerId !== state.pointerId) return;
+      const dx = e.clientX - state.startX;
+      state.offset = state.startOffset + dx;
+      apply();
+      const now = performance.now();
+      const ddt = (now - state.lastMoveTs) / 1000;
+      if (ddt > 0) state.velocity = (e.clientX - state.lastMoveX) / ddt;
+      state.lastMoveX = e.clientX;
+      state.lastMoveTs = now;
+    };
+    const onUp = (e) => {
+      if (!state.dragging) return;
+      state.dragging = false;
+      state.inertia = state.velocity;
+      wrapper.classList.remove('is-dragging');
+      try { wrapper.releasePointerCapture(e.pointerId); } catch(_) {}
+    };
+
+    wrapper.addEventListener('pointerdown',   onDown);
+    wrapper.addEventListener('pointermove',   onMove);
+    wrapper.addEventListener('pointerup',     onUp);
+    wrapper.addEventListener('pointercancel', onUp);
+
+    // 4) Pause hors viewport (économie CPU)
+    new IntersectionObserver((entries) => {
+      entries.forEach(en => state.paused = !en.isIntersecting);
+    }, { threshold: 0 }).observe(wrapper);
+
+    // 5) Recalcul largeur si resize
+    let rt;
+    window.addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = setTimeout(() => {
+        const fc = list.querySelector('[data-marquee-clone="1"]');
+        if (fc) setWidth = fc.offsetLeft;
+      }, 150);
+    });
+
+    state.raf = requestAnimationFrame(tick);
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

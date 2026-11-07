@@ -1,0 +1,44 @@
+/* ── nav-header ── source Webflow : cmp_main-header_embed-header.html ── */
+.mega-menu-ecole-container,
+.mega-menu-programme-container {
+  opacity: 0;
+  display: none;
+  transition: opacity 200ms ease-in-out;
+}
+
+.mega-menu-ecole-container.active,
+.mega-menu-programme-container.active {
+  display: flex; /* ou block selon ton layout */
+  opacity: 1;
+}
+
+.nav_component {
+  transition: background-color 200ms ease-in-out;
+  background-color: transparent;
+}
+
+.nav_component.nav_scrolled {
+  background-color: rgba(21, 21, 22, 0.98);
+  /* ou bien : background-color: #151516cc; */
+}
+
+.menu-sm,
+.mega-menu-ecole-container,
+.mega-menu-programme-container{
+display:none;
+}
+
+@media screen and (max-width: 1092px) {
+  .brochure-head {
+    display: none !important;
+  }
+}
+
+  @media screen and (max-width: 1260px) {
+  .nav_menu {
+    display: none;
+  }
+  .burger-menu {
+    display: flex;
+  }
+}
