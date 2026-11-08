@@ -12,7 +12,7 @@ https://cdn.jsdelivr.net/gh/Cetezer44/naostage-webflow-custom-code@<TAG>/dist/pa
 https://cdn.jsdelivr.net/gh/Cetezer44/naostage-webflow-custom-code@<TAG>/dist/pages/<page>.min.js
 ```
 
-`<TAG>` = tag git (ex. `v1.0.0`) **ou hash de commit** (ex. `e0ed2b5b1e85d0f6456fb909482f639ded44b4d0`, utilisé pour la v1.0.0 : la création du tag depuis l'environnement de migration était bloquée — créer le tag `v1.0.0` sur GitHub depuis le commit `e0ed2b5` si on préfère des URLs lisibles). Les URLs taguées sont immuables et mises en cache définitivement par jsDelivr : **pour déployer une modification, on crée un nouveau tag puis on met à jour le tag dans les snippets Webflow** (site + pages concernées). Les snippets à coller sont dans `webflow/`.
+`<TAG>` = tag git (ex. `v1.0.0`) **ou hash de commit** (ex. `0a5a7cef26b37c113ed2a7d3079c09ea0fd5d439`, utilisé pour la v1.1.0 : la création du tag depuis l'environnement de migration était bloquée — créer le tag `v1.1.0` sur GitHub depuis le commit `0a5a7ce` si on préfère des URLs lisibles). Les URLs taguées sont immuables et mises en cache définitivement par jsDelivr : **pour déployer une modification, on crée un nouveau tag puis on met à jour le tag dans les snippets Webflow** (site + pages concernées). Les snippets à coller sont dans `webflow/`.
 
 ## Structure
 
@@ -43,16 +43,15 @@ https://cdn.jsdelivr.net/gh/Cetezer44/naostage-webflow-custom-code@<TAG>/dist/pa
 | Page | Modules |
 |---|---|
 | `home` (Accueil) | `marquee-recognitions`, `marquee-partners`, `marquee-testimonials`, `carousel-showcases` |
-| `a-propos` | `slider-about` (Swiper équipe) |
 | `contact` | `contact-form` (champ "Autres" conditionnel, honeypot anti-spam) |
-| `faq` | `faq-accordion`, `kapta-calculator` (le **markup HTML** du calculateur reste dans l'Embed Webflow, seuls CSS/JS sont ici) |
+| `faq` | `faq-accordion` |
 | `network` | `marquee-partners`, `network-map` (carte Leaflet des revendeurs) |
 | `categorie-applications` | `applications-category` (couleurs des tags solution, layout alterné) |
 
 ### Resté dans Webflow (volontairement)
 - Balises **GA4 / GTM**, `hreflang`, `google-site-verification` (head site) et le `<noscript>` GTM (footer site).
 - Librairies tierces déjà sur CDN : Leaflet, jQuery (+UI, easing), Swiper, Finsweet Autovideo, GSAP + ScrollTrigger.
-- Embeds qui contiennent du **markup** : vidéos `<video>` (showreel, section vidéo solution FR/EN), icônes SVG inline (*Item Scope*, *Item Details*), inputs cachés + script de la page 401, markup du calculateur KAPTA.
+- Embeds qui contiennent du **markup** : vidéos `<video>` (showreel, section vidéo solution FR/EN), icônes SVG inline (*Item Scope*, *Item Details*), inputs cachés + script de la page 401, 
 - Les 4 mini-embeds de couleur par solution (`.sol-color-txt/.sol-color-bg` sur K SYSTEM Sense/Flow/Custom, BEAKON Module) et l'override `.mega-menu-ecole-container` de la page *Components Navigation Smartphone* : spécifiques à une page, ~100 octets, pas d'intérêt à externaliser.
 
 ## Modifier le code
@@ -70,3 +69,7 @@ Puis remplacer `@v1.0.0` par `@v1.1.0` dans les snippets Webflow (site + pages) 
 
 ## Restaurer l'état d'avant migration
 Tout est dans `backup/2026-11-07/` : `site-head.html`, `site-footer.html` et un fichier par Embed (`cmp_*` = dans un composant, `home_*` = page Accueil, `page_*` = autres pages). Le fichier `backup/2026-11-07/inventory.json` donne l'ID d'élément Webflow de chaque Embed.
+
+## Historique
+- **v1.1.0 (2026-11-08, commit `0a5a7ce`)** : retrait du calculateur KAPTA (FAQ) et du slider équipe (À propos) — éléments supprimés dans Webflow. Images CMS optimisées (1700 px max, WebP) via la branche `cms-images-2026-11` (hébergement temporaire le temps que Webflow ré-héberge ; la branche peut être supprimée).
+- **v1.0.0 (2026-11-07, commit `e0ed2b5`)** : migration initiale.
