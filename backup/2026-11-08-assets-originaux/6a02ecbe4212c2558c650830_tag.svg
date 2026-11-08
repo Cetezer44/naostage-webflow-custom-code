@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Calque_2" data-name="Calque 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 588.35 671.01">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #fff;
+        stroke-miterlimit: 13.33;
+        stroke-width: 28.35px;
+      }
+    </style>
+  </defs>
+  <g id="svg2655">
+    <g>
+      <path id="path2673" class="cls-1" d="M94.17,496.84h400c44.18,0,80,35.82,80,80s-35.82,80-80,80H94.17c-44.18,0-80-35.82-80-80s35.82-80,80-80Z"/>
+      <path id="path2677" class="cls-1" d="M274.17,576.84h40"/>
+      <path id="path2681" class="cls-1" d="M573.93,570.6l-39.88-519.53c-1.59-20.61-18.87-36.9-39.88-36.9H94.17c-21.01,0-38.29,16.29-39.88,36.9L14.41,570.6"/>
+      <path id="path2685" class="cls-1" d="M131.41,147.64c96.96-69.34,228.57-69.34,325.53,0"/>
+      <path id="path2689" class="cls-1" d="M177.91,212.74c69.25-49.52,163.26-49.52,232.52,0"/>
+      <path id="path2693" class="cls-1" d="M224.42,277.85c41.55-29.72,97.96-29.72,139.51,0"/>
+      <path id="path2697" class="cls-1" d="M334.17,375.51c0,22.09-17.91,40-40,40s-40-17.91-40-40,17.91-40,40-40,40,17.91,40,40Z"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Calque_2" data-name="Calque 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 627.85 682.67">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 20px;
+      }
+    </style>
+  </defs>
+  <g id="svg837">
+    <g>
+      <path id="path855" class="cls-1" d="M617.69,161.8L313.85,10,10,161.8"/>
+      <path id="path859" class="cls-1" d="M583.76,537.82c11.42-5.82,23.42-11.15,34.08-17.82,0-120,0-238.67-.15-358.2-13.77,6.87,0,.21,0,0-39.85,20.87-81.18,40.87-122.04,60.88"/>
+      <path id="path863" class="cls-1" d="M313.85,672.67l209.47-104.65"/>
+      <path id="path867" class="cls-1" d="M132.04,222.68L10,161.8v359.07l303.85,151.8v-144.31"/>
+      <path id="path871" class="cls-1" d="M313.85,528.35l181.81-90.83-181.81-90.83-181.81,90.83,181.81,90.83Z"/>
+      <path id="path875" class="cls-1" d="M176.65,200.4l-44.6,22.28v214.85l181.81-90.54v-215.14l-90.03,44.98"/>
+      <path id="path879" class="cls-1" d="M495.65,437.53l-181.81-90.54v-215.14l181.81,90.83v214.85Z"/>
+    </g>
+  </g>
+</svg>
