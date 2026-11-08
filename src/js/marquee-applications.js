@@ -24,8 +24,23 @@
         ['opacity','transform','translate','rotate','scale','visibility'].forEach(p => el.style.removeProperty(p));
         el.removeAttribute('data-w-id');            // IX2 ne rebindera pas les clones
       });
-      root.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
+      // Lazy tant que la section est loin du viewport (bande passante) ; passe en eager à l'approche (voir warmUp)
+      root.querySelectorAll('img').forEach(img => { img.loading = wrapper.dataset.marqueeNear === '1' ? 'eager' : 'lazy'; });
     };
+    // Dès que le marquee approche du viewport, toutes les images (originaux + clones) passent en eager
+    // pour éviter le pop-in pendant le défilement horizontal.
+    const warmUp = () => {
+      wrapper.dataset.marqueeNear = '1';
+      list.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some(e => e.isIntersecting)) { warmUp(); io.disconnect(); }
+      }, { rootMargin: '800px 0px' });
+      io.observe(wrapper);
+    } else {
+      warmUp();
+    }
     const sanitizeAll = () => list.querySelectorAll('[data-marquee-clone="1"]').forEach(sanitize);
 
     const cloneSet = () => originals.forEach(orig => {
