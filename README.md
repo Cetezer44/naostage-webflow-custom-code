@@ -71,5 +71,9 @@ Puis remplacer `@v1.0.0` par `@v1.1.0` dans les snippets Webflow (site + pages) 
 Tout est dans `backup/2026-11-07/` : `site-head.html`, `site-footer.html` et un fichier par Embed (`cmp_*` = dans un composant, `home_*` = page Accueil, `page_*` = autres pages). Le fichier `backup/2026-11-07/inventory.json` donne l'ID d'élément Webflow de chaque Embed.
 
 ## Historique
+
+### v1.2.0 — 2026-11-08 (`baf784af586e162138e5e5635bcf7883f035061d`)
+- `marquee-applications` : les clones du marquee ne forcent plus `loading="eager"` tant que la section est hors viewport (IntersectionObserver, marge 800 px). Évite de charger ~2,5 Mo d'images Applications sur chaque visite de l'accueil et des pages Solutions.
+
 - **v1.1.0 (2026-11-08, commit `0a5a7ce`)** : retrait du calculateur KAPTA (FAQ) et du slider équipe (À propos) — éléments supprimés dans Webflow. Images CMS optimisées (1700 px max, WebP) via la branche `cms-images-2026-11` (hébergement temporaire le temps que Webflow ré-héberge ; la branche peut être supprimée).
 - **v1.0.0 (2026-11-07, commit `e0ed2b5`)** : migration initiale.
