@@ -7,3 +7,4 @@ import "./js/anim-fade-up.js";
 import "./js/video-youtube.js";
 import "./js/lightbox.js";
 import "./js/marquee-applications.js";
+import './js/popup-banners.js';

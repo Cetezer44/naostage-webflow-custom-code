@@ -72,6 +72,10 @@ Tout est dans `backup/2026-11-07/` : `site-head.html`, `site-footer.html` et un 
 
 ## Historique
 
+### v1.3.0 — 2026-11-09
+- Nouveau module `popup-banners` (site-wide) : fermeture des bannières popup du composant Webflow « Popup Bannière » (croix `[data-popup-close]`), mémorisée pour la session via `sessionStorage` (clé = `data-popup-id`, lié à la propriété « Identifiant »).
+
+
 ### v1.2.0 — 2026-11-08 (`baf784af586e162138e5e5635bcf7883f035061d`)
 - `marquee-applications` : les clones du marquee ne forcent plus `loading="eager"` tant que la section est hors viewport (IntersectionObserver, marge 800 px). Évite de charger ~2,5 Mo d'images Applications sur chaque visite de l'accueil et des pages Solutions.
 
