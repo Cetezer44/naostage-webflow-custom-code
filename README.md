@@ -73,7 +73,7 @@ Tout est dans `backup/2026-11-07/` : `site-head.html`, `site-footer.html` et un 
 ## Historique
 
 ### v1.3.0 — 2026-11-09
-- Nouveau module `popup-banners` (site-wide) : fermeture des bannières popup du composant Webflow « Popup Bannière » (croix `[data-popup-close]`), mémorisée pour la session via `sessionStorage` (clé = `data-popup-id`, lié à la propriété « Identifiant »).
+- Nouveau module `popup-banners` (site-wide) : fermeture des bannières popup du composant Webflow « Popup Bannière » (croix `[data-popup-close]`) — sans mémorisation : les popups réapparaissent à chaque chargement (v1.3.1).
 
 
 ### v1.2.0 — 2026-11-08 (`baf784af586e162138e5e5635bcf7883f035061d`)
